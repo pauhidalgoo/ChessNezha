@@ -1,8 +1,10 @@
 from nezhaplayer import ChessPlayer
+import time
 class ChessGame:
     def __init__(self):
         self.board = self.initialize_board()
         self.player = ChessPlayer("white")
+        self.player2 = ChessPlayer("black")
 
     def initialize_board(self):
         board = [
@@ -22,6 +24,11 @@ class ChessGame:
             self.print_board()
             move = self.player.get_move(self.board)
             self.make_move(move)
+            time.sleep(1)
+            move = self.player2.get_move(self.board)
+            self.make_move(move)
+            time.sleep(1)
+
         print("Game Over")
 
     def is_game_over(self):
@@ -34,7 +41,7 @@ class ChessGame:
         self.board[final_row][final_col] = self.board[initial_row][initial_col]
         self.board[initial_row][initial_col] = ' '
         self.print_board()
-        raise
+        print("----------------")
         pass
 
     def print_board(self):
