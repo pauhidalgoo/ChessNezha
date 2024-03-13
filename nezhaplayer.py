@@ -36,9 +36,9 @@ class ChessPlayer:
         if piece == '♕' or piece == '♛':
             moves.extend(self._get_queen_moves(board, row, col))
         if piece == '♔' or piece == '♚':
-            moves.extend(self._get_queen_moves(board, row, col))
-        if piece == '♘' or piece == '♞':
             moves.extend(self._get_king_moves(board, row, col))
+        if piece == '♘' or piece == '♞':
+            moves.extend(self._get_knight_moves(board, row, col))
         return moves
     def _get_pawn_moves(self, board, row, col):
         moves = []
@@ -76,26 +76,26 @@ class ChessPlayer:
         moves = []
         directions = {"forward": True, "backward": True, "left": True, "right": True}
         for step in range(1,8):
-            if row - step >= 0 and directions["backward"]:
+            if row - step >= 0 and directions["backward"] == True:
                 if board[row - step][col] == ' ':
                     moves.append(((row, col), (row - step, col)))
                 else:
                     directions["backward"] = False
-            if row + step < 8 and directions["forward"]:
+            if row + step < 8 and directions["forward"] == True:
                 if board[row + step][col] == ' ':
                     moves.append(((row, col), (row + step, col)))
                 else:
                     directions["forward"] = False
-            if col - step >= 0 and directions["left"]:
+            if col - step >= 0 and directions["left"] == True:
                 if board[row][col - step] == ' ':
                     moves.append(((row, col), (row, col - step)))
                 else:
                     directions["left"] = False
-            if col + step < 8 and directions["right"]:
+            if col + step < 8 and directions["right"] == True:
                 if board[row][col + step] == ' ':
                     moves.append(((row, col), (row, col + step)))
                 else:
-                    directions["rigth"] = False
+                    directions["right"] = False
         return moves
     def _get_bishop_moves(self, board, row, col):
         moves = []
