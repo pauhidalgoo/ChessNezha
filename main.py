@@ -24,10 +24,8 @@ class ChessGame:
             self.print_board()
             move = self.player.get_move(self.board)
             self.make_move(move)
-            time.sleep(1)
             move = self.player2.get_move(self.board)
             self.make_move(move)
-            time.sleep(1)
 
         print("Game Over")
 
