@@ -1,10 +1,14 @@
 from nezhaplayer import ChessPlayer
+from humanplayer import HumanPlayer
 import time
+import random
 class ChessGame:
-    def __init__(self):
+    def __init__(self, human = False):
         self.board = self.initialize_board()
-        self.player = ChessPlayer("white")
-        self.player2 = ChessPlayer("black")
+        first = random.choice(["white", "black"])
+        second = "black" if first == "white" else "white"
+        self.player = ChessPlayer(first)
+        self.player2 = ChessPlayer(second) if not human else HumanPlayer(second)
         self._enpassant = False
     def initialize_board(self):
         board = [
@@ -88,6 +92,5 @@ class ChessGame:
         
 
 if __name__ == "__main__":
-    for _ in range(100):
-        game = ChessGame()
-        game.play_game()
+    game = ChessGame(human=True)
+    game.play_game()
