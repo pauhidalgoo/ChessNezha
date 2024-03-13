@@ -11,13 +11,34 @@ class ChessPlayer:
         else:
             print("The color is incorrect. It must be white or black")
             raise
+
+        self.left_castling= True
+        self.right_castling = True
         pass
     def get_move(self, board):
         legal_moves = self.get_legal_moves(board)
         if legal_moves:
-            return legal_moves[random.randint(0, len(legal_moves)-1)]
+            move =  legal_moves[random.randint(0, len(legal_moves)-1)]
         else:
-            return None
+            move =  None
+        initial_row, initial_col = move[0][0], move[0][1]
+
+        if self.left_castling or self.right_castling:
+            if board[initial_row][initial_col] == '♜':
+                if initial_col == 0 and initial_row == 0:
+                    self.left_castling = False
+                if initial_col == 7 and initial_row == 0:
+                    self.right_castling = False
+            if board[initial_row][initial_col] == '♖':
+                if initial_col == 0 and initial_row == 7:
+                    self.left_castling = False
+                if initial_col == 7 and initial_row == 7:
+                    self.right_castling = False
+            if board[initial_row][initial_col] == '♔' or board[initial_row][initial_col] == '♚':
+                self.left_castling = False
+                self.right_castling = False
+        return move
+
     def get_legal_moves(self, board):
         legal_moves = []
         for row_id, row in enumerate(board):
@@ -183,4 +204,12 @@ class ChessPlayer:
             moves.append(((row, col), (row, col - 1)))
         if col + 1 < 8 and (board[row][col + 1] == ' ' or board[row][col + 1] in self.other_pieces):
             moves.append(((row, col), (row, col + 1)))
+
+
+        if self.left_castling:
+            if board[row][col - 1] == ' ' and board[row][col - 2] == ' ' and board[row][col - 3] == ' ':
+                moves.append(((row, col), (row, col - 2), (row, 0), (row, 3)))
+        if self.right_castling:
+            if board[row][col + 1] == ' ' and board[row][col + 2] == ' ':
+                moves.append(((row, col), (row, col + 2), (row, 7), (row, 5)))
         return moves

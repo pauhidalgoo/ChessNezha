@@ -42,6 +42,12 @@ class ChessGame:
             print(self.board[initial_row][initial_col] + "  killed "+ self.board[final_row][final_col])
         self.board[final_row][final_col] = self.board[initial_row][initial_col]
         self.board[initial_row][initial_col] = ' '
+        if len(move) == 4:
+            initial_rook_row, initial_rook_col = move[2][0], move[2][1]
+            final_rook_row, final_rook_col = move[3][0], move[3][1]
+            self.board[final_rook_row][final_rook_col] = self.board[initial_rook_row][initial_rook_col]
+            self.board[final_rook_row][initial_rook_col] = ' '
+            print("Castled")
         self.print_board()
         print("----------------")
         pass
