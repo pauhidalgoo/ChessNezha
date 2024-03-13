@@ -4,8 +4,10 @@ class ChessPlayer:
         self.color = color
         if self.color== "white":
             self.pieces =  ['♜', '♞', '♝', '♛', '♚','♟']
+            self.other_pieces = ['♖', '♘', '♗', '♕', '♔', '♙']
         elif self.color=="black":
             self.pieces = ['♖', '♘', '♗', '♕', '♔', '♙']
+            self.other_pieces = ['♜', '♞', '♝', '♛', '♚','♟']
         else:
             print("The color is incorrect. It must be white or black")
             raise
@@ -50,25 +52,35 @@ class ChessPlayer:
             moves.append(((row, col), (row - 2, col)))
         if self.color == "white" and row == 1 and board[row + 2][col] == ' ':
             moves.append(((row, col), (row + 2, col)))
+        if self.color == "black" and row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1] in self.other_pieces:
+            moves.append(((row, col), (row - 1, col - 1)))
+        if self.color == "black" and row - 1 >= 0 and col + 1 < 8 and board[row - 1][col - 1] in self.other_pieces:
+            moves.append(((row, col), (row - 1, col + 1)))
+
+        if self.color == "white" and row + 1 < 8 and col - 1 >= 0 and board[row + 1][col - 1] in self.other_pieces:
+            moves.append(((row, col), (row + 1, col - 1)))
+        if self.color == "white" and row + 1 < 8 and col + 1 < 8 and board[row + 1][col - 1] in self.other_pieces:
+            moves.append(((row, col), (row + 1, col + 1)))
+        
         return moves
     def _get_knight_moves(self, board, row, col):
         moves = []
-        if row - 2 >= 0 and col - 1 >= 0 and board[row - 2][col - 1] == ' ':
+        if row - 2 >= 0 and col - 1 >= 0 and (board[row - 2][col - 1] == ' ' or board[row - 2][col - 1] in self.other_pieces):
             moves.append(((row, col), (row - 2, col - 1)))
-        if row - 2 >= 0 and col + 1 < 8 and board[row - 2][col + 1] == ' ':
+        if row - 2 >= 0 and col + 1 < 8 and (board[row - 2][col + 1] == ' ' or board[row - 2][col + 1] in self.other_pieces):
             moves.append(((row, col), (row - 2, col + 1)))
-        if row - 1 >= 0 and col - 2 >= 0 and board[row - 1][col - 2] == ' ':
+        if row - 1 >= 0 and col - 2 >= 0 and (board[row - 1][col - 2] == ' ' or board[row - 1][col - 2] in self.other_pieces):
             moves.append(((row, col), (row - 1, col - 2)))
-        if row - 1 >= 0 and col + 2 < 8 and board[row - 1][col + 2] == ' ':
+        if row - 1 >= 0 and col + 2 < 8 and (board[row - 1][col + 2] == ' ' or board[row - 1][col + 2] in self.other_pieces):
             moves.append(((row, col), (row - 1, col + 2)))
         
-        if row + 2 < 8 and col - 1 >= 0 and board[row + 2][col - 1] == ' ':
+        if row + 2 < 8 and col - 1 >= 0 and (board[row + 2][col - 1] == ' ' or board[row + 2][col - 1] in self.other_pieces):
             moves.append(((row, col), (row + 2, col - 1)))
-        if row + 2 < 8 and col + 1 < 8 and board[row + 2][col + 1] == ' ':
+        if row + 2 < 8 and col + 1 < 8 and (board[row + 2][col + 1] == ' ' or board[row + 2][col + 1] in self.other_pieces):
             moves.append(((row, col), (row + 2, col + 1)))
-        if row + 1 < 8 and col - 2 >= 0 and board[row + 1][col - 2] == ' ':
+        if row + 1 < 8 and col - 2 >= 0 and (board[row + 1][col - 2] == ' ' or board[row + 1][col - 2] in self.other_pieces):
             moves.append(((row, col), (row + 1, col - 2)))
-        if row + 1 < 8 and col + 2 < 8 and board[row + 1][col + 2] == ' ':
+        if row + 1 < 8 and col + 2 < 8 and (board[row + 1][col + 2] == ' ' or board[row + 1][col + 2] in self.other_pieces):
             moves.append(((row, col), (row + 1, col + 2)))
 
         return moves
@@ -79,21 +91,33 @@ class ChessPlayer:
             if row - step >= 0 and directions["backward"] == True:
                 if board[row - step][col] == ' ':
                     moves.append(((row, col), (row - step, col)))
+                elif board[row - step][col] in self.other_pieces:
+                    moves.append(((row, col), (row - step, col)))
+                    directions["backward"] = False
                 else:
                     directions["backward"] = False
             if row + step < 8 and directions["forward"] == True:
                 if board[row + step][col] == ' ':
                     moves.append(((row, col), (row + step, col)))
+                elif board[row + step][col] in self.other_pieces:
+                    moves.append(((row, col), (row + step, col)))
+                    directions["forward"] = False
                 else:
                     directions["forward"] = False
             if col - step >= 0 and directions["left"] == True:
                 if board[row][col - step] == ' ':
                     moves.append(((row, col), (row, col - step)))
+                elif board[row][col - step] in self.other_pieces:
+                    moves.append(((row, col), (row, col - step)))
+                    directions["left"] = False
                 else:
                     directions["left"] = False
             if col + step < 8 and directions["right"] == True:
                 if board[row][col + step] == ' ':
                     moves.append(((row, col), (row, col + step)))
+                elif board[row][col + step] in self.other_pieces:
+                    moves.append(((row, col), (row, col + step)))
+                    directions["right"] = False
                 else:
                     directions["right"] = False
         return moves
@@ -104,21 +128,33 @@ class ChessPlayer:
             if row - step >= 0 and col - step >= 0 and directions["-dia"]:
                 if board[row - step][col - step] == ' ':
                     moves.append(((row, col), (row - step, col - step)))
+                elif board[row - step][col - step] in self.other_pieces:
+                    moves.append(((row, col), (row - step, col - step)))
+                    directions["-dia"] = False
                 else:
                     directions["-dia"] = False
             if row + step < 8 and col + step < 8 and directions["dia"]:
                 if board[row + step][col + step] == ' ':
                     moves.append(((row, col), (row + step, col + step)))
+                elif board[row + step][col + step] in self.other_pieces:
+                    moves.append(((row, col), (row + step, col + step)))
+                    directions["dia"] = False
                 else:
                     directions["dia"] = False
             if row - step >= 0 and col + step < 8 and directions["-gonal"]:
                 if board[row - step][col + step] == ' ':
-                    moves.append(((row, col), (row - step , col  + step)))
+                    moves.append(((row, col), (row - step , col + step)))
+                elif board[row - step][col + step] in self.other_pieces:
+                    moves.append(((row, col), (row - step, col + step)))
+                    directions["-gonal"] = False
                 else:
                     directions["-gonal"] = False
             if row + step < 8 and col - step >= 0 and directions["gonal"]:
                 if board[row + step][col - step] == ' ':
                     moves.append(((row, col), (row + step, col - step)))
+                elif board[row + step][col - step] in self.other_pieces:
+                    moves.append(((row, col), (row + step, col - step)))
+                    directions["gonal"] = False
                 else:
                     directions["gonal"] = False
         return moves
@@ -129,20 +165,22 @@ class ChessPlayer:
         return moves
     def _get_king_moves(self, board, row, col):
         moves = []
-        if row - 1 >= 0 and board[row - 1][col] == ' ':
-            moves.append(((row, col), (row - 1, col)))
-            if col - 1 >= 0 and board[row][col - 1] == ' ':
-                moves.append(((row, col), (row, col - 1)))
-            if board[row - 1][col - 1] == ' ':
+        if row - 1 >= 0:
+            if board[row - 1][col] == ' ' or board[row - 1][col] in self.other_pieces:
+                moves.append(((row, col), (row - 1, col)))
+            if col - 1 >= 0 and (board[row - 1][col - 1] == ' ' or board[row - 1][col - 1] in self.other_pieces):
                 moves.append(((row, col), (row - 1, col - 1)))
-            if col + 1 < 8 and board[row][col + 1] == ' ':
-                moves.append(((row, col), (row, col + 1)))
-            if board[row - 1][col + 1] == ' ':
+            if col + 1 < 8 and (board[row - 1][col + 1] == ' ' or board[row - 1][col + 1] in self.other_pieces):
                 moves.append(((row, col), (row - 1, col + 1)))
-        if row + 1 < 8 and board[row + 1][col] == ' ':
-            moves.append(((row, col), (row + 1, col)))
-            if col - 1 >= 0 and board[row + 1][col - 1] == ' ':
+        if row + 1 < 8:
+            if board[row + 1][col] == ' ' or board[row + 1][col] in self.other_pieces:
+                moves.append(((row, col), (row + 1, col)))
+            if col - 1 >= 0 and (board[row + 1][col - 1] == ' ' or board[row + 1][col - 1] in self.other_pieces):
                 moves.append(((row, col), (row + 1, col - 1)))
-            if col + 1 < 8 and board[row + 1][col + 1] == ' ':
+            if col + 1 < 8 and (board[row + 1][col + 1] == ' ' or board[row -+ 1][col - 1] in self.other_pieces):
                 moves.append(((row, col), (row + 1, col + 1)))
+        if col - 1 >= 0 and (board[row][col - 1] == ' ' or board[row][col - 1] in self.other_pieces):
+            moves.append(((row, col), (row, col - 1)))
+        if col + 1 < 8 and (board[row][col + 1] == ' ' or board[row][col + 1] in self.other_pieces):
+            moves.append(((row, col), (row, col + 1)))
         return moves

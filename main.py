@@ -24,9 +24,10 @@ class ChessGame:
         while not self.is_game_over():
             move = self.player.get_move(self.board)
             self.make_move(move)
+            time.sleep(1)
             move = self.player2.get_move(self.board)
             self.make_move(move)
-            time.sleep(0.1)
+            time.sleep(1)
 
         print("Game Over")
 
@@ -37,6 +38,8 @@ class ChessGame:
         print(move)
         initial_row, initial_col = move[0][0], move[0][1]
         final_row, final_col = move[1][0], move[1][1]
+        if self.board[final_row][final_col] != ' ':
+            print(self.board[initial_row][initial_col] + "  killed "+ self.board[final_row][final_col])
         self.board[final_row][final_col] = self.board[initial_row][initial_col]
         self.board[initial_row][initial_col] = ' '
         self.print_board()
