@@ -18,7 +18,11 @@ class ChessPlayer:
     def get_move(self, board):
         legal_moves = self.get_legal_moves(board)
         if legal_moves:
-            move =  legal_moves[random.randint(0, len(legal_moves)-1)]
+            capturing_moves = [move for move in legal_moves if self.is_capture(board, move)]
+            if capturing_moves:
+                move = random.choice(capturing_moves)
+            else:
+                move = random.choice(legal_moves)
         else:
             move =  None
         initial_row, initial_col = move[0][0], move[0][1]
@@ -63,16 +67,22 @@ class ChessPlayer:
         if piece == '♘' or piece == '♞':
             moves.extend(self._get_knight_moves(board, row, col))
         return moves
+    
+    def is_capture(self, board, move):
+        target_row, target_col = move[1][0], move[1][1]
+        target_piece = board[target_row][target_col]
+        return target_piece != ' '
+    
     def _get_pawn_moves(self, board, row, col):
         moves = []
         if self.color == "black" and row - 1 >= 0 and board[row - 1][col] == ' ':
             moves.append(((row, col), (row - 1, col)))
         if self.color == "white" and row + 1 < 8 and board[row + 1][col] == ' ':
             moves.append(((row, col), (row + 1, col)))
-        if self.color == "black" and row == 6 and board[row - 2][col] == ' ':
-            moves.append(((row, col), (row - 2, col)))
-        if self.color == "white" and row == 1 and board[row + 2][col] == ' ':
-            moves.append(((row, col), (row + 2, col)))
+        if self.color == "black" and row == 6 and board[row - 2][col] == ' ' and board[row - 1][col] == ' ':
+            moves.append(((row, col), (row - 2, col), (row - 1, col)))
+        if self.color == "white" and row == 1 and board[row + 2][col] == ' ' and board[row + 1][col] == ' ':
+            moves.append(((row, col), (row + 2, col), (row + 1, col)))
         if self.color == "black" and row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1] in self.other_pieces:
             moves.append(((row, col), (row - 1, col - 1)))
         if self.color == "black" and row - 1 >= 0 and col + 1 < 8 and board[row - 1][col - 1] in self.other_pieces:
@@ -198,7 +208,7 @@ class ChessPlayer:
                 moves.append(((row, col), (row + 1, col)))
             if col - 1 >= 0 and (board[row + 1][col - 1] == ' ' or board[row + 1][col - 1] in self.other_pieces):
                 moves.append(((row, col), (row + 1, col - 1)))
-            if col + 1 < 8 and (board[row + 1][col + 1] == ' ' or board[row -+ 1][col - 1] in self.other_pieces):
+            if col + 1 < 8 and (board[row + 1][col + 1] == ' ' or board[row + 1][col + 1] in self.other_pieces):
                 moves.append(((row, col), (row + 1, col + 1)))
         if col - 1 >= 0 and (board[row][col - 1] == ' ' or board[row][col - 1] in self.other_pieces):
             moves.append(((row, col), (row, col - 1)))
