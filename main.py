@@ -5,7 +5,7 @@ class ChessGame:
         self.board = self.initialize_board()
         self.player = ChessPlayer("white")
         self.player2 = ChessPlayer("black")
-
+        self._enpassant = True
     def initialize_board(self):
         board = [
             ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
@@ -24,18 +24,33 @@ class ChessGame:
         while not self.is_game_over():
             move = self.player.get_move(self.board)
             self.make_move(move)
-            time.sleep(1)
+            if self.is_game_over():
+                break
             move = self.player2.get_move(self.board)
             self.make_move(move)
-            time.sleep(1)
+            time.sleep(0.1)
 
-        print("Game Over")
+        print("Game Over. " + self.is_game_over() + " has won.")
 
     def is_game_over(self):
-        pass
+        black = False
+        white = False
+        for row in self.board:
+            for piece in row:
+                if piece == '♔':
+                    black = True
+                    if white:
+                        return False
+                if piece == '♚':
+                    white = True
+                    if black:
+                        return False
+        if black:
+            return "Black"
+        else:
+            return "White"
 
     def make_move(self, move):
-        print(move)
         initial_row, initial_col = move[0][0], move[0][1]
         final_row, final_col = move[1][0], move[1][1]
         if self.board[final_row][final_col] != ' ':
