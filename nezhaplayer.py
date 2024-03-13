@@ -133,14 +133,16 @@ class ChessPlayer:
             moves.append(((row, col), (row - 1, col)))
             if col - 1 >= 0 and board[row][col - 1] == ' ':
                 moves.append(((row, col), (row, col - 1)))
+            if board[row - 1][col - 1] == ' ':
                 moves.append(((row, col), (row - 1, col - 1)))
             if col + 1 < 8 and board[row][col + 1] == ' ':
                 moves.append(((row, col), (row, col + 1)))
+            if board[row - 1][col + 1] == ' ':
                 moves.append(((row, col), (row - 1, col + 1)))
         if row + 1 < 8 and board[row + 1][col] == ' ':
             moves.append(((row, col), (row + 1, col)))
-            if col - 1 >= 0 and board[row][col - 1] == ' ':
+            if col - 1 >= 0 and board[row + 1][col - 1] == ' ':
                 moves.append(((row, col), (row + 1, col - 1)))
-            if col + 1 < 8 and board[row][col + 1] == ' ':
+            if col + 1 < 8 and board[row + 1][col + 1] == ' ':
                 moves.append(((row, col), (row + 1, col + 1)))
         return moves
