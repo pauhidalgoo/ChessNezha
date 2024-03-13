@@ -37,6 +37,8 @@ class ChessPlayer:
             moves.extend(self._get_queen_moves(board, row, col))
         if piece == '♔' or piece == '♚':
             moves.extend(self._get_queen_moves(board, row, col))
+        if piece == '♘' or piece == '♞':
+            moves.extend(self._get_king_moves(board, row, col))
         return moves
     def _get_pawn_moves(self, board, row, col):
         moves = []
@@ -50,7 +52,26 @@ class ChessPlayer:
             moves.append(((row, col), (row + 2, col)))
         return moves
     def _get_knight_moves(self, board, row, col):
-        pass
+        moves = []
+        if row - 2 >= 0 and col - 1 >= 0 and board[row - 2][col - 1] == ' ':
+            moves.append(((row, col), (row - 2, col - 1)))
+        if row - 2 >= 0 and col + 1 < 8 and board[row - 2][col + 1] == ' ':
+            moves.append(((row, col), (row - 2, col + 1)))
+        if row - 1 >= 0 and col - 2 >= 0 and board[row - 1][col - 2] == ' ':
+            moves.append(((row, col), (row - 1, col - 2)))
+        if row - 1 >= 0 and col + 2 < 8 and board[row - 1][col + 2] == ' ':
+            moves.append(((row, col), (row - 1, col + 2)))
+        
+        if row + 2 < 8 and col - 1 >= 0 and board[row + 2][col - 1] == ' ':
+            moves.append(((row, col), (row + 2, col - 1)))
+        if row + 2 < 8 and col + 1 < 8 and board[row + 2][col + 1] == ' ':
+            moves.append(((row, col), (row + 2, col + 1)))
+        if row + 1 < 8 and col - 2 >= 0 and board[row + 1][col - 2] == ' ':
+            moves.append(((row, col), (row + 1, col - 2)))
+        if row + 1 < 8 and col + 2 < 8 and board[row + 1][col + 2] == ' ':
+            moves.append(((row, col), (row + 1, col + 2)))
+
+        return moves
     def _get_rock_moves(self, board, row, col):
         moves = []
         directions = {"forward": True, "backward": True, "left": True, "right": True}

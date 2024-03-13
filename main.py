@@ -20,12 +20,14 @@ class ChessGame:
         return board
 
     def play_game(self):
+        self.print_board()
         while not self.is_game_over():
-            self.print_board()
             move = self.player.get_move(self.board)
             self.make_move(move)
+            time.sleep(1)
             move = self.player2.get_move(self.board)
             self.make_move(move)
+            time.sleep(1)
 
         print("Game Over")
 
