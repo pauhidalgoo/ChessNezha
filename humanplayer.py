@@ -11,8 +11,13 @@ class HumanPlayer(ChessPlayer):
                 if move_input == "exit":
                     raise KeyboardInterrupt
                 move = self.parse_move(move_input)
-                if move in self.get_legal_moves(board):
+                legal_moves = self.get_legal_moves(board)
+                normalized = [move[0:2] for move in self.get_available_moves(board)]
+                if move in legal_moves:
                     return move
+                elif move in normalized:
+                    index = normalized.index(move)
+                    return legal_moves[index]
                 else:
                     print("Invalid move.")
             except KeyboardInterrupt:

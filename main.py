@@ -173,7 +173,7 @@ class ChessGame:
         
 
 if __name__ == "__main__":
-    game = ChessGame()
+    game = ChessGame(human=True)
     game.play_game()
     print("White player was", game.player.__class__)
     """
