@@ -135,6 +135,11 @@ class ChessPlayer:
             moves.append(((row, col), (row + 1, col - 1)))
         if color == "white" and row + 1 < 8 and col + 1 < 8 and board[row + 1][col - 1] in other_pieces:
             moves.append(((row, col), (row + 1, col + 1)))
+
+        if color == "black" and row - 1 >= 0 and col - 1 >= 0 and board[row - 1][col - 1] in other_pieces:
+            moves.append(((row, col), (row - 1, col - 1)))
+        if color == "black" and row - 1 >= 0 and col + 1 < 8 and board[row - 1][col + 1] in other_pieces:
+            moves.append(((row, col), (row - 1, col + 1)))
         
         return moves
     def _get_knight_moves(self, board, row, col, color = None):

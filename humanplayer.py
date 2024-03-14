@@ -13,6 +13,7 @@ class HumanPlayer(ChessPlayer):
                 move = self.parse_move(move_input)
                 legal_moves = self.get_legal_moves(board)
                 normalized = [move[0:2] for move in self.get_available_moves(board)]
+                print(legal_moves)
                 if move in legal_moves:
                     return move
                 elif move in normalized:
