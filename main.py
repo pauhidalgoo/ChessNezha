@@ -1,15 +1,23 @@
 from nezhaplayer import ChessPlayer
 from humanplayer import HumanPlayer
+from minimaxplayer import MinimaxPlayer
 import time
 import random
 class ChessGame:
-    def __init__(self, human = False):
+    def __init__(self, human = False, verbose = True):
         self.board = self.initialize_board()
+        self.print = verbose
         first = random.choice(["white", "black"])
-        second = "black" if first == "white" else "white"
-        self.player = ChessPlayer(first)
-        self.player2 = ChessPlayer(second) if not human else HumanPlayer(second)
+        if first == "white":
+            self.player = MinimaxPlayer("white")
+            self.player2 = ChessPlayer("black") if not human else HumanPlayer("black")
+        else:
+            self.player2 = MinimaxPlayer("black")
+            self.player = ChessPlayer("white") if not human else HumanPlayer("white")
         self._enpassant = False
+        self.move_history = []
+        self.repetition_count = {}
+        print("Minimax plays", first)
     def initialize_board(self):
         board = [
             ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
@@ -27,31 +35,41 @@ class ChessGame:
         self.print_board()
         while not (self.is_game_over() in ["white", "black", "no one"]):
             if self.is_game_over() != False:
-                print("Forced move")
+                print("Forced move") if self.print else None
                 move = self.is_game_over()
             else:
                 move = self.player.get_move(self.board)
             if move == None:
-                print("Game Over. Stalemate.")
+                print("Game Over. Stalemate.") if self.print else None
                 break
             self.make_move(move)
-            time.sleep(0.1)
+            self.move_history.append(self.board)
             if self.is_game_over() in ["white", "black", "no one"]:
                 break
             elif self.is_game_over() != False:
-                print("Forced move")
+                print("Forced move") if self.print else None
                 move = self.is_game_over()
             else:
                 move = self.player2.get_move(self.board)
             if move == None:
-                print("Game Over. Stalemate.")
+                print("Game Over. Stalemate.") if self.print else None
                 break
             self.make_move(move)
-            time.sleep(0.1)
+            self.move_history.append(self.board)
+            if self.is_repetition():
+                print("Draw by repetition.")
+                return "draw"
 
         if self.is_game_over() != False:
-            print("Game Over. " + self.is_game_over() + " has won.")
-
+            print("Game Over. " + self.is_game_over() + " has won.") if self.print else None
+            return self.is_game_over()
+        else:
+            return "stalemate"
+        
+    def is_repetition(self):
+        board_state = str(self.board)
+        self.repetition_count[board_state] = self.repetition_count.get(board_state, 0) + 1
+        return self.repetition_count[board_state] >= 5
     def is_game_over(self):
         black_king = None
         white_king = None
@@ -110,20 +128,19 @@ class ChessGame:
                 capturing_moves = [move for move in legal_moves if play.is_capture(temp_board, move) and move[1] == new_king_position]
             if len(capturing_moves) == 0:
                 return False, move
-        print("checkmatee")
-        return True
+        return True, None
 
     def make_move(self, move):
-        print(move)
+        print(move) if self.print else None
         initial_row, initial_col = move[0][0], move[0][1]
         final_row, final_col = move[1][0], move[1][1]
         if self.board[final_row][final_col] != ' ':
-            print(self.board[initial_row][initial_col] + "  killed "+ self.board[final_row][final_col])
+            print(self.board[initial_row][initial_col] + "  killed "+ self.board[final_row][final_col]) if self.print else None
 
         self.board[final_row][final_col] = self.board[initial_row][initial_col]
 
         if self._enpassant != False and (final_row,final_col) == self._enpassant[0]:
-            print(self.board[initial_row][initial_col] + "  killed by en passant "+ self.board[self._enpassant[1][0]][self._enpassant[1][1]])
+            print(self.board[initial_row][initial_col] + "  killed by en passant "+ self.board[self._enpassant[1][0]][self._enpassant[1][1]]) if self.print else None
             self.board[self._enpassant[1][0]][self._enpassant[1][1]] = ' '
 
         self.board[initial_row][initial_col] = ' '
@@ -133,7 +150,7 @@ class ChessGame:
             final_rook_row, final_rook_col = move[3][0], move[3][1]
             self.board[final_rook_row][final_rook_col] = self.board[initial_rook_row][initial_rook_col]
             self.board[initial_rook_row][initial_rook_col] = ' '
-            print("Castled")
+            print("Castled") if self.print else None
 
         if len(move) == 3: # Save for en passant
             self._enpassant = (move[2], move[1])
@@ -141,20 +158,28 @@ class ChessGame:
             self._enpassant = False
         
         if self.board[final_row][final_col] == "♙" and final_row == 0:
-            print("you can promote!")
+            print("you can promote!") if self.print else None
             self.board[final_row][final_col] = "♕"
         if self.board[final_row][final_col] == "♟" and final_row == 7:
-            print("you can promote!")
+            print("you can promote!") if self.print else None
             self.board[final_row][final_col] = "♛"
         self.print_board()
-        print("----------------")
+        print("----------------") if self.print else None
         pass
 
     def print_board(self):
         for row in self.board:
-            print(" ".join(row))
+            print(" ".join(row)) if self.print else None if self.print else None
         
 
 if __name__ == "__main__":
     game = ChessGame()
     game.play_game()
+    print("White player was", game.player.__class__)
+    """
+    for i in range(100):
+        random.seed(i)
+        print("Iteration ",i)
+        game = ChessGame(print=False)
+        print(game.play_game())
+    """
