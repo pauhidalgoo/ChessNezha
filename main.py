@@ -4,16 +4,20 @@ from minimaxplayer import MinimaxPlayer
 import time
 import random
 class ChessGame:
-    def __init__(self, human = False, verbose = True):
+    def __init__(self, human = False, verbose = True, player1 = None, player2 = None, params1 = [None, 3], params2 = [None, 3]):
+        player1 = player1 if player1 != None else MinimaxPlayer
+        player2 = player2 if player2 != None else ChessPlayer if not human else HumanPlayer
         self.board = self.initialize_board()
         self.print = verbose
         first = random.choice(["white", "black"])
         if first == "white":
-            self.player = MinimaxPlayer("white")
-            self.player2 = ChessPlayer("black") if not human else HumanPlayer("black")
+            self.player = player1("white") if player1 != MinimaxPlayer else player1("white", params1[0], params1[1])
+            self.player2 = player2("black") if player2 != MinimaxPlayer else player2("black", params2[0], params2[1])
+            print("Player1 is white")
         else:
-            self.player2 = MinimaxPlayer("black")
-            self.player = ChessPlayer("white") if not human else HumanPlayer("white")
+            self.player2 = player1("black")
+            self.player = player2("white")
+            print("Player2 is white")
         self._enpassant = False
         self.move_history = []
         self.repetition_count = {}
@@ -173,7 +177,7 @@ class ChessGame:
         
 
 if __name__ == "__main__":
-    game = ChessGame(human=True)
+    game = ChessGame(player1 = MinimaxPlayer, player2=MinimaxPlayer, params2=[[6,3,1,15,100,1],2])
     game.play_game()
     print("White player was", game.player.__class__)
     """

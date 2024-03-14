@@ -1,11 +1,14 @@
 from nezhaplayer import ChessPlayer
+import random
 class MinimaxPlayer(ChessPlayer):
-    def __init__(self, color):
+    def __init__(self, color, weights = None, depth = 3):
         super().__init__(color)
         self.color = color
         self._enpassant = False
         self.left_castling= False
         self.right_castling = False
+        self.weights = weights if weights != None else [5, 3, 3, 9, 100, 1]
+        self.depth = depth
         if self.color== "white":
             self.pieces =  ['♜', '♞', '♝', '♛', '♚','♟']
             self.other_pieces = ['♖', '♘', '♗', '♕', '♔', '♙']
@@ -13,7 +16,7 @@ class MinimaxPlayer(ChessPlayer):
             self.pieces = ['♖', '♘', '♗', '♕', '♔', '♙']
             self.other_pieces = ['♜', '♞', '♝', '♛', '♚','♟']
     def get_move(self, board):
-        best_move = self.minimax(board, 3, True, float("-inf"), float("inf"))[1]
+        best_move = self.minimax(board, self.depth, True, float("-inf"), float("inf"))[1]
 
         if best_move == None:
             return None
@@ -42,6 +45,7 @@ class MinimaxPlayer(ChessPlayer):
         other_color = "black" if color == "white" else "white"
         if maximizing_player:
             legal_moves = self.get_available_moves(board, self.pieces, color)
+            random.shuffle(legal_moves)
             max_eval = float("-inf")
             best_move = None
             for move in legal_moves:
@@ -70,7 +74,7 @@ class MinimaxPlayer(ChessPlayer):
             return min_eval, best_move
 
     def evaluate_board(self, board):
-        piece_values = [5, 3, 3, 9, 100, 1]
+        piece_values = self.weights
         total_evaluation = 0
         for row in board:
             for square in row:
