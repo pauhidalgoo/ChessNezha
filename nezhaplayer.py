@@ -15,8 +15,9 @@ class ChessPlayer:
         self.left_castling= True
         self.right_castling = True
         pass
+     
     def get_move(self, board):
-        legal_moves = self.get_legal_moves(board)
+        legal_moves = self.get_available_moves(board)
         if legal_moves:
             capturing_moves = [move for move in legal_moves if self.is_capture(board, move)]
             if capturing_moves:
@@ -24,7 +25,7 @@ class ChessPlayer:
             else:
                 move = random.choice(legal_moves)
         else:
-            move =  None
+            return None
         initial_row, initial_col = move[0][0], move[0][1]
 
         if self.left_castling or self.right_castling:
@@ -51,6 +52,38 @@ class ChessPlayer:
                     moves = self.get_piece_moves(board, row_id, col_id)
                     legal_moves.extend(moves)
         return legal_moves
+    
+    def get_available_moves(self, board):
+        legal_moves = self.get_legal_moves(board)
+        for row_id, row in enumerate(board):
+            for col_id, piece in enumerate(row):
+                if piece == '♔' and self.color == "black":
+                    king_position = (row_id, col_id)
+                    break
+                elif piece == '♚' and self.color == "white":
+                    king_position = (row_id, col_id)
+                    break
+        final_moves = []
+        for move in legal_moves:
+            temp_board = [row[:] for row in board]
+            initial_pos, final_pos = move[0], move[1]
+            temp_board[final_pos[0]][final_pos[1]] = temp_board[initial_pos[0]][initial_pos[1]]
+            temp_board[initial_pos[0]][initial_pos[1]] = ' '
+            new_king_position = king_position if temp_board[king_position[0]][king_position[1]] != ' ' else (final_pos[0], final_pos[1])
+            if not self.check(temp_board, new_king_position):
+                final_moves.append(move)
+        return final_moves
+    
+    def check(self, board, king_position):
+        play = ChessPlayer("black") if self.color == "white" else ChessPlayer("white")
+        play.left_castling = False
+        play.right_castling = False
+        legal_moves = play.get_legal_moves(board)
+        capturing_moves = []
+        if legal_moves:
+            capturing_moves = [move for move in legal_moves if play.is_capture(board, move) and move[1] == king_position]
+        return len(capturing_moves) > 0
+    
     def get_piece_moves(self, board, row, col):
         piece = board[row][col]
         moves = []

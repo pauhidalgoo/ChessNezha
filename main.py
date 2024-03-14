@@ -25,35 +25,93 @@ class ChessGame:
 
     def play_game(self):
         self.print_board()
-        while not self.is_game_over():
-            move = self.player.get_move(self.board)
-            self.make_move(move)
-            time.sleep(1)
-            if self.is_game_over():
+        while not (self.is_game_over() in ["white", "black", "no one"]):
+            if self.is_game_over() != False:
+                print("Forced move")
+                move = self.is_game_over()
+            else:
+                move = self.player.get_move(self.board)
+            if move == None:
+                print("Game Over. Stalemate.")
                 break
-            move = self.player2.get_move(self.board)
             self.make_move(move)
-            time.sleep(1)
+            time.sleep(0.1)
+            if self.is_game_over() in ["white", "black", "no one"]:
+                break
+            elif self.is_game_over() != False:
+                print("Forced move")
+                move = self.is_game_over()
+            else:
+                move = self.player2.get_move(self.board)
+            if move == None:
+                print("Game Over. Stalemate.")
+                break
+            self.make_move(move)
+            time.sleep(0.1)
 
-        print("Game Over. " + self.is_game_over() + " has won.")
+        if self.is_game_over() != False:
+            print("Game Over. " + self.is_game_over() + " has won.")
 
     def is_game_over(self):
-        black = False
-        white = False
-        for row in self.board:
-            for piece in row:
+        black_king = None
+        white_king = None
+        other_pieces = None
+        for row_id, row in enumerate(self.board):
+            for col_id, piece in enumerate(row):
                 if piece == '♔':
-                    black = True
-                    if white:
-                        return False
-                if piece == '♚':
-                    white = True
-                    if black:
-                        return False
-        if black:
-            return "Black"
-        else:
-            return "White"
+                    black_king = (row_id, col_id)
+                elif piece == '♚':
+                    white_king = (row_id, col_id)
+                elif piece != ' ':
+                    other_pieces = True
+        if other_pieces == None:
+            return "no one"
+        if black_king == None:
+            return "white"
+        if white_king == None:
+            return "black"
+        if self.is_in_check(black_king, 'black'):
+            checkmate = self.is_checkmate(black_king, 'black')
+            if checkmate[0]:
+                return "white"
+            else:
+                return checkmate[1]
+        elif self.is_in_check(white_king, 'white'):
+            checkmate = self.is_checkmate(white_king, 'white')
+            if checkmate[0]:
+                return "black"
+            else:
+                return checkmate[1]
+        return False
+
+    def is_in_check(self, king_position, color):
+        play = self.player if self.player.color != color else self.player2
+        legal_moves = play.get_available_moves(self.board)
+        capturing_moves = []
+        if legal_moves:
+            capturing_moves = [move for move in legal_moves if play.is_capture(self.board, move) and move[1] == king_position]
+        return len(capturing_moves) > 0
+
+    def is_checkmate(self, king_position, color):
+        temp_board = [row[:] for row in self.board]
+        player = self.player if self.player.color == color else self.player2
+        legal_moves = player.get_available_moves(temp_board)
+        for move in legal_moves:
+            temp_board = [row[:] for row in self.board]
+            initial_pos, final_pos = move[0], move[1]
+            temp_board[final_pos[0]][final_pos[1]] = temp_board[initial_pos[0]][initial_pos[1]]
+            temp_board[initial_pos[0]][initial_pos[1]] = ' '
+            new_king_position = king_position if temp_board[king_position[0]][king_position[1]] != ' ' else (final_pos[0], final_pos[1])
+            
+            play = self.player if self.player.color != color else self.player2
+            legal_moves = play.get_available_moves(temp_board)
+            capturing_moves = []
+            if legal_moves:
+                capturing_moves = [move for move in legal_moves if play.is_capture(temp_board, move) and move[1] == new_king_position]
+            if len(capturing_moves) == 0:
+                return False, move
+        print("checkmatee")
+        return True
 
     def make_move(self, move):
         print(move)
@@ -67,7 +125,6 @@ class ChessGame:
         if self._enpassant != False and (final_row,final_col) == self._enpassant[0]:
             print(self.board[initial_row][initial_col] + "  killed by en passant "+ self.board[self._enpassant[1][0]][self._enpassant[1][1]])
             self.board[self._enpassant[1][0]][self._enpassant[1][1]] = ' '
-            raise
 
         self.board[initial_row][initial_col] = ' '
 
@@ -75,13 +132,20 @@ class ChessGame:
             initial_rook_row, initial_rook_col = move[2][0], move[2][1]
             final_rook_row, final_rook_col = move[3][0], move[3][1]
             self.board[final_rook_row][final_rook_col] = self.board[initial_rook_row][initial_rook_col]
-            self.board[final_rook_row][initial_rook_col] = ' '
+            self.board[initial_rook_row][initial_rook_col] = ' '
             print("Castled")
 
         if len(move) == 3: # Save for en passant
             self._enpassant = (move[2], move[1])
         else:
             self._enpassant = False
+        
+        if self.board[final_row][final_col] == "♙" and final_row == 0:
+            print("you can promote!")
+            self.board[final_row][final_col] = "♕"
+        if self.board[final_row][final_col] == "♟" and final_row == 7:
+            print("you can promote!")
+            self.board[final_row][final_col] = "♛"
         self.print_board()
         print("----------------")
         pass
@@ -92,5 +156,5 @@ class ChessGame:
         
 
 if __name__ == "__main__":
-    game = ChessGame(human=True)
+    game = ChessGame()
     game.play_game()
