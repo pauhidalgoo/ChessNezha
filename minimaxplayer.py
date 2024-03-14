@@ -71,6 +71,9 @@ class MinimaxPlayer(ChessPlayer):
                 beta = min(beta, eval_val)
                 if beta <= alpha:
                     break
+            if legal_moves == []:
+                min_eval = 0
+                best_move = None
             return min_eval, best_move
 
     def evaluate_board(self, board):
